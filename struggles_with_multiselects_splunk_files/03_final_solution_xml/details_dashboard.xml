@@ -1,0 +1,48 @@
+<form theme="dark">
+  <search>
+    <query>
+      |makeresults
+      | eval drilldown_multi_sourcetypes = $drilldown_multi_sourcetypes|s$  
+	    </query>
+    <done>
+      <eval token="form.multi_sourcetypes">split($result.drilldown_multi_sourcetypes$,",")</eval>
+    </done>
+  </search>
+  <label>Details Dashboard with a Multiselect</label>
+  <description>Shows some super detailed information about the selected sourcetypes</description>
+  <fieldset submitButton="false"></fieldset>
+  <row>
+    <panel>
+      <input type="multiselect" token="multi_sourcetypes">
+        <label>Select Sourcetype(s)</label>
+        <search>
+          <query>index=_internal   
+| dedup sourcetype  
+| table sourcetype  
+| sort sourcetype</query>
+          <earliest>-24h</earliest>
+          <latest>now</latest>
+        </search>
+        <choice value="*">all</choice>
+        <delimiter> OR </delimiter>
+        <fieldForLabel>sourcetype</fieldForLabel>
+        <fieldForValue>sourcetype</fieldForValue>
+        <default>*</default>
+        <valuePrefix>sourcetype="</valuePrefix>
+        <prefix>(</prefix>
+        <suffix>)</suffix>
+        <valueSuffix>"</valueSuffix>
+      </input>
+      <table>
+        <title>Events of selected Sourcetype(s)</title>
+        <search>
+          <query>index=_internal $multi_sourcetypes$</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+</form>

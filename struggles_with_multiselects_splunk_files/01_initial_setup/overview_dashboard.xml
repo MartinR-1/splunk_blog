@@ -1,0 +1,45 @@
+<form>
+  <label>Overview Dashboard with a Multiselect</label>
+  <description>Shows some basic information about the selected sourcetypes</description>
+  <fieldset submitButton="false"></fieldset>
+  <row>
+    <panel>
+      <input type="multiselect" token="multi_sourcetypes">
+        <label>Select Sourcetype(s)</label>
+        <search>
+          <query>  
+index=_internal   
+| dedup sourcetype  
+| table sourcetype  
+| sort sourcetype  
+</query>
+          <earliest>-24h</earliest>
+          <latest>now</latest>
+        </search>
+        <choice value="*">all</choice>
+        <delimiter> OR </delimiter>
+        <fieldForLabel>sourcetype</fieldForLabel>
+        <fieldForValue>sourcetype</fieldForValue>
+        <default>*</default>
+        <valuePrefix>sourcetype="</valuePrefix>
+        <prefix>(</prefix>
+        <suffix>)</suffix>
+        <valueSuffix>"</valueSuffix>
+      </input>
+      <table>
+        <title>Sourcetypes within last 24 hours after filter applied</title>
+        <search>
+          <query>  
+index=_internal $multi_sourcetypes$  
+| stats values(sourcetype) as sourcetype values(index) as index values(status) as status  
+</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="count">5</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+</form>
